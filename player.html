@@ -1,0 +1,262 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Player</title>
+<style>
+*{
+	box-sizing:border-box;
+}
+body,html{
+	margin: 0;
+	padding: 0;
+}
+.clearfix::before ,.clearfix::after{
+ 	display: table;
+    content: " ";
+}
+.clearfix::after{
+ 	clear: both;
+}
+.player_mothim {
+    min-height: 80px;
+    background: #1E999E;
+    margin: 5px;
+    font-family: 'Open Sans',sans-serif;
+    color: #fff;
+}
+.capa_mothim {
+    width: 125px;
+    padding: 7px 11px;
+    float: left;
+}
+.capa_mothim > img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    max-height: 80px;
+    margin: 0 auto;
+    float: left;
+}
+.infos_mothim {
+    width: calc(100% - 125px);
+    float: left;
+}
+.time_now, .total_time {
+    width: 50px;
+    padding: 5px;
+    margin-right: 6px;
+    font-size: 11px;
+    float: left;
+}
+
+.w_time_bar {
+	height: 5px;
+    background: #fff;
+    width: calc(100% - 119px);
+    float: left;
+    position: relative;
+    top: 10px;
+}
+
+.time_bar {
+	height: 5px;
+    background: #f6a777;
+    border-right: 1px solid #000;
+}
+
+.name_track {
+    max-height: 32px;
+    padding: 5px;
+    font-size: 15px;
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    animation: textani 11s linear infinite;
+}
+.name_track:hover {
+    animation-play-state: paused
+}
+.b_track {
+    width: 30px;
+    height: 30px;
+    margin: 0 3px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    text-align: center;
+    overflow: hidden;
+    float: left;
+}
+.m_buttons_p {
+    width: 150px;
+    margin: 10px auto;
+}
+
+@keyframes textani {
+    0%   { text-indent: 70% }
+    100% { text-indent: -156% }
+}
+
+</style>
+</head>
+
+<body>
+	<div class="wrap_player" style="max-width: 600px;">
+		<div class="player_mothim clearfix">
+			<div class="capa_mothim clearfix">
+				<img class="capa_mothim_img" src="http://i.imgur.com/glNxvJd.png" alt="capa">
+			</div>
+			<div class="infos_mothim clearfix">
+				<div class="name_track"></div>
+				<div class="wrap_time_track  clearfix">
+					<div class="time_now">00:00:00</div>
+					<div class="w_time_bar">
+						<div class="time_bar"></div>
+					</div>
+					<div class="total_time">00:00:00</div>
+				</div>
+				<div class="wrap_buttons">
+					<div class="m_buttons_p clearfix">
+						<div class="prev_track b_track">«</div>
+						<div class="pause_track b_track">II</div>
+						<div class="play_track b_track">►</div>
+						<div class="next_track b_track">»</div>
+					</div>
+				</div>
+			</div>
+			<div id="w_audio">
+				<audio id="p_mothim">
+					<source id="sound_track_m" src="#" type="audio/mpeg"> </source>
+					Desculpe mas seu disposítivo não oferece suporte para esse Player.
+				</audio>
+			</div>
+		</div>
+	</div>
+<script>
+
+
+//variavel do player
+var pMo = document.getElementById("p_mothim");
+
+//musics 
+var playlist = 
+	[{
+		faixaName:"Abertura Pokémon XYZ - Fan Made",
+		faixaUrl:"mp3/xyz.mp3",
+		faixaCapa:"image/xyz.jpg"
+	},{
+		faixaName:"Lillie Theme - Pokémon Sun Moon Extended",
+		faixaUrl:"mp3/lillie.mp3",
+		faixaCapa:"image/lillie.jpg",
+	},{
+		faixaName:"Professor Kukui Theme - Pokémon Sun Moon Extended",
+		faixaUrl:"mp3/kukui01.mp3",
+		faixaCapa:"image/kukui.jpg",
+	}];
+//
+
+//Definições
+var confg ={
+	faixaAtual:0,
+	faixatotal:playlist.length,
+	a:document.getElementsByClassName("time_bar"),
+	b:document.getElementsByClassName("time_now"),
+	c:document.getElementsByClassName("total_time"),
+	d:document.getElementsByClassName("capa_mothim_img"),
+	e:document.getElementsByClassName("name_track"),
+	f:document.getElementsByClassName("prev_track"),
+	g:document.getElementsByClassName("next_track"),
+	h:document.getElementsByClassName("play_track"),
+	i:document.getElementsByClassName("pause_track"),
+};
+function createrPlayer(status){
+	if (playlist.length > 0) {
+		var soundP = document.getElementById("sound_track_m");
+		soundP.setAttribute("src", playlist[confg.faixaAtual].faixaUrl);
+		confg.d[0].setAttribute("src",playlist[confg.faixaAtual].faixaCapa || "http://i.imgur.com/glNxvJd.png") ;
+		confg.e[0].textContent = playlist[confg.faixaAtual].faixaName || "Faixa desconhecida";
+		pMo.load();
+		if (status) {
+			pMo.play();
+		}
+	} else {
+		console.log('erro player');
+	}
+
+}
+createrPlayer();
+
+function timeConvert(time){
+	var horas = Math.floor(time / 3600) || 0;
+	if(horas <= 9){
+		horas = "0"+horas;
+	}
+	var minutos = Math.floor((time - (horas * 3600)) / 60) || 0;
+	if(minutos <= 9){
+		minutos = "0"+minutos;
+	}
+	var segundos = Math.floor(time % 60) || 0;
+	if(segundos <= 9){
+		segundos = "0"+segundos;
+	}
+	var timeC = horas + ":" + minutos + ":" + segundos;
+	return timeC;
+}
+//automatize passa a faixa automaticamente se existir na playlist
+function automatize(){
+	if (confg.faixaAtual != playlist.length) {
+		confg.faixaAtual = parseInt(confg.faixaAtual + 1) ;
+		createrPlayer(true);
+	}else{
+		confg.faixaAtual = 0;
+		createrPlayer(true);
+	}
+}
+//Função que atualizar o progresso
+pMo.addEventListener("timeupdate", function() { 
+	//barra atual
+	confg.a[0].setAttribute( "style","width:"+ parseInt(this.currentTime / this.duration * 100) + "%;");
+	//Tempo atual
+	confg.b[0].textContent = timeConvert(Math.floor(this.currentTime));
+	//Escreve o total de tempo/minutos
+	confg.c[0].textContent = timeConvert(Math.floor(this.duration)); 
+	if (this.currentTime === this.duration) {
+		automatize();
+	}
+}, true);
+
+//função Play
+confg.h[0].addEventListener("click", function() { 
+	pMo.play();
+}, true);
+
+//função Play
+confg.i[0].addEventListener("click", function() { 
+	pMo.pause();
+}, true);
+
+//Função próximo
+confg.g[0].addEventListener("click", function() { 
+	if (confg.faixaAtual < playlist.length - 1){       //o -1 reduz o valor total exemplo atual 0 e 1 o length conta 0,1 e 2
+		confg.faixaAtual = parseInt(confg.faixaAtual + 1);
+		createrPlayer(true);
+	}else{
+		confg.faixaAtual = 0;
+		createrPlayer(true);
+	}
+}, true);
+
+//função anterior
+confg.f[0].addEventListener("click", function() { 
+	if (confg.faixaAtual === 0){       
+		confg.faixaAtual = playlist.length - 1;
+		createrPlayer(true);
+	}else{
+		confg.faixaAtual = parseInt(confg.faixaAtual - 1);
+		createrPlayer(true);
+	}
+}, true);
+
+</script>
+</body>
+</html>
