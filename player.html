@@ -102,41 +102,40 @@ body,html{
 
 <body>
 	<div class="wrap_player" style="max-width: 600px;">
-		<div class="player_mothim clearfix">
-			<div class="capa_mothim clearfix">
-				<img class="capa_mothim_img" src="http://i.imgur.com/glNxvJd.png" alt="capa">
-			</div>
-			<div class="infos_mothim clearfix">
-				<div class="name_track"></div>
-				<div class="wrap_time_track  clearfix">
-					<div class="time_now">00:00:00</div>
-					<div class="w_time_bar">
-						<div class="time_bar"></div>
-					</div>
-					<div class="total_time">00:00:00</div>
-				</div>
-				<div class="wrap_buttons">
-					<div class="m_buttons_p clearfix">
-						<div class="prev_track b_track">«</div>
-						<div class="pause_track b_track">II</div>
-						<div class="play_track b_track">►</div>
-						<div class="next_track b_track">»</div>
-					</div>
-				</div>
-			</div>
-			<div id="w_audio">
-				<audio id="p_mothim">
-					<source id="sound_track_m" src="#" type="audio/mpeg"> </source>
-					Desculpe mas seu disposítivo não oferece suporte para esse Player.
-				</audio>
-			</div>
-		</div>
 	</div>
 <script>
+//codigo html
+var htmlCode = '<div class="player_mothim clearfix">'+
+			'<div class="capa_mothim clearfix">'+
+				'<img class="capa_mothim_img" src="http://i.imgur.com/glNxvJd.png" alt="capa">'+
+			'</div>'+
+			'<div class="infos_mothim clearfix">'+
+				'<div class="name_track"></div>'+
+				'<div class="wrap_time_track  clearfix">'+
+					'<div class="time_now">00:00:00</div>'+
+					'<div class="w_time_bar">'+
+						'<div class="time_bar"></div>'+
+					'</div>'+
+					'<div class="total_time">00:00:00</div>'+
+				'</div>'+
+				'<div class="wrap_buttons">'+
+					'<div class="m_buttons_p clearfix">'+
+						'<div class="prev_track b_track">«</div>'+
+						'<div class="pause_track b_track">II</div>'+
+						'<div class="play_track b_track">►</div>'+
+						'<div class="next_track b_track">»</div>'+
+					'</div>'+
+				'</div>'+
+			'</div>'+
+			'<div id="w_audio">'+
+				'<audio id="p_mothim">'+
+					'<source id="sound_track_m" src="#" type="audio/mpeg"> </source>'+
+					'Desculpe mas seu disposítivo não oferece suporte para esse Player.'+
+				'</audio>'+
+			'</div>'+
+		'</div>';
 
 
-//variavel do player
-var pMo = document.getElementById("p_mothim");
 
 //musics 
 var playlist = 
@@ -168,95 +167,104 @@ var confg ={
 	g:document.getElementsByClassName("next_track"),
 	h:document.getElementsByClassName("play_track"),
 	i:document.getElementsByClassName("pause_track"),
+	j:document.getElementsByClassName("wrap_player"),
 };
-function createrPlayer(status){
-	if (playlist.length > 0) {
-		var soundP = document.getElementById("sound_track_m");
-		soundP.setAttribute("src", playlist[confg.faixaAtual].faixaUrl);
-		confg.d[0].setAttribute("src",playlist[confg.faixaAtual].faixaCapa || "http://i.imgur.com/glNxvJd.png") ;
-		confg.e[0].textContent = playlist[confg.faixaAtual].faixaName || "Faixa desconhecida";
-		pMo.load();
-		if (status) {
-			pMo.play();
+
+if(confg.j[0]){
+	//Gerando codigo html
+	confg.j[0].innerHTML = htmlCode;
+	
+	//variavel do player
+	var pMo = document.getElementById("p_mothim");
+
+	function createrPlayer(status){
+		if (playlist.length > 0) {
+			var soundP = document.getElementById("sound_track_m");
+			soundP.setAttribute("src", playlist[confg.faixaAtual].faixaUrl);
+			confg.d[0].setAttribute("src",playlist[confg.faixaAtual].faixaCapa || "http://i.imgur.com/glNxvJd.png") ;
+			confg.e[0].textContent = playlist[confg.faixaAtual].faixaName || "Faixa desconhecida";
+			pMo.load();
+			if (status) {
+				pMo.play();
+			}
+		} else {
+			console.log('erro player');
 		}
-	} else {
-		console.log('erro player');
-	}
 
+	}
+	createrPlayer();
+
+	function timeConvert(time){
+		var horas = Math.floor(time / 3600) || 0;
+		if(horas <= 9){
+			horas = "0"+horas;
+		}
+		var minutos = Math.floor((time - (horas * 3600)) / 60) || 0;
+		if(minutos <= 9){
+			minutos = "0"+minutos;
+		}
+		var segundos = Math.floor(time % 60) || 0;
+		if(segundos <= 9){
+			segundos = "0"+segundos;
+		}
+		var timeC = horas + ":" + minutos + ":" + segundos;
+		return timeC;
+	}
+	//automatize passa a faixa automaticamente se existir na playlist
+	function automatize(){
+		if (confg.faixaAtual != playlist.length) {
+			confg.faixaAtual = parseInt(confg.faixaAtual + 1) ;
+			createrPlayer(true);
+		}else{
+			confg.faixaAtual = 0;
+			createrPlayer(true);
+		}
+	}
+	//Função que atualizar o progresso
+	pMo.addEventListener("timeupdate", function() { 
+		//barra atual
+		confg.a[0].setAttribute( "style","width:"+ parseInt(this.currentTime / this.duration * 100) + "%;");
+		//Tempo atual
+		confg.b[0].textContent = timeConvert(Math.floor(this.currentTime));
+		//Escreve o total de tempo/minutos
+		confg.c[0].textContent = timeConvert(Math.floor(this.duration)); 
+		if (this.currentTime === this.duration) {
+			automatize();
+		}
+	}, true);
+
+	//função Play
+	confg.h[0].addEventListener("click", function() { 
+		pMo.play();
+	}, true);
+
+	//função Play
+	confg.i[0].addEventListener("click", function() { 
+		pMo.pause();
+	}, true);
+
+	//Função próximo
+	confg.g[0].addEventListener("click", function() { 
+		if (confg.faixaAtual < playlist.length - 1){       //o -1 reduz o valor total exemplo atual 0 e 1 o length conta 0,1 e 2
+			confg.faixaAtual = parseInt(confg.faixaAtual + 1);
+			createrPlayer(true);
+		}else{
+			confg.faixaAtual = 0;
+			createrPlayer(true);
+		}
+	}, true);
+
+	//função anterior
+	confg.f[0].addEventListener("click", function() { 
+		if (confg.faixaAtual === 0){       
+			confg.faixaAtual = playlist.length - 1;
+			createrPlayer(true);
+		}else{
+			confg.faixaAtual = parseInt(confg.faixaAtual - 1);
+			createrPlayer(true);
+		}
+	}, true);
 }
-createrPlayer();
-
-function timeConvert(time){
-	var horas = Math.floor(time / 3600) || 0;
-	if(horas <= 9){
-		horas = "0"+horas;
-	}
-	var minutos = Math.floor((time - (horas * 3600)) / 60) || 0;
-	if(minutos <= 9){
-		minutos = "0"+minutos;
-	}
-	var segundos = Math.floor(time % 60) || 0;
-	if(segundos <= 9){
-		segundos = "0"+segundos;
-	}
-	var timeC = horas + ":" + minutos + ":" + segundos;
-	return timeC;
-}
-//automatize passa a faixa automaticamente se existir na playlist
-function automatize(){
-	if (confg.faixaAtual != playlist.length) {
-		confg.faixaAtual = parseInt(confg.faixaAtual + 1) ;
-		createrPlayer(true);
-	}else{
-		confg.faixaAtual = 0;
-		createrPlayer(true);
-	}
-}
-//Função que atualizar o progresso
-pMo.addEventListener("timeupdate", function() { 
-	//barra atual
-	confg.a[0].setAttribute( "style","width:"+ parseInt(this.currentTime / this.duration * 100) + "%;");
-	//Tempo atual
-	confg.b[0].textContent = timeConvert(Math.floor(this.currentTime));
-	//Escreve o total de tempo/minutos
-	confg.c[0].textContent = timeConvert(Math.floor(this.duration)); 
-	if (this.currentTime === this.duration) {
-		automatize();
-	}
-}, true);
-
-//função Play
-confg.h[0].addEventListener("click", function() { 
-	pMo.play();
-}, true);
-
-//função Play
-confg.i[0].addEventListener("click", function() { 
-	pMo.pause();
-}, true);
-
-//Função próximo
-confg.g[0].addEventListener("click", function() { 
-	if (confg.faixaAtual < playlist.length - 1){       //o -1 reduz o valor total exemplo atual 0 e 1 o length conta 0,1 e 2
-		confg.faixaAtual = parseInt(confg.faixaAtual + 1);
-		createrPlayer(true);
-	}else{
-		confg.faixaAtual = 0;
-		createrPlayer(true);
-	}
-}, true);
-
-//função anterior
-confg.f[0].addEventListener("click", function() { 
-	if (confg.faixaAtual === 0){       
-		confg.faixaAtual = playlist.length - 1;
-		createrPlayer(true);
-	}else{
-		confg.faixaAtual = parseInt(confg.faixaAtual - 1);
-		createrPlayer(true);
-	}
-}, true);
-
 </script>
 </body>
 </html>
